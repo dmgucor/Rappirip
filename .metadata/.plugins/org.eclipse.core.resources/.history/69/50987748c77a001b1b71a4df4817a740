@@ -1,0 +1,15 @@
+package main;
+
+import javax.swing.JFrame;
+
+public class LoginGUI {
+	JFrame frame;
+	
+	public LoginGUI() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 200, 100);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+	}
+}

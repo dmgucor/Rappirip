@@ -1,0 +1,39 @@
+package main;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+
+public class LoginGUI {
+	JFrame frame;
+	String[] labels = {"Username: ", "Passsword: "};
+
+	public LoginGUI() {
+		//Configuración de la ventana
+		frame = new JFrame();
+		frame.setBounds(100, 100, 200, 100);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setResizable(false);
+		frame.setLayout(new SpringLayout());
+
+		//Agregar labels y textFields
+		JLabel username = new JLabel(labels[0], JLabel.TRAILING);
+		frame.add(username);
+		JTextField usernameField = new JTextField(25);
+		username.setLabelFor(usernameField);
+		frame.add(usernameField);
+
+		JLabel password = new JLabel(labels[1], JLabel.TRAILING);
+		frame.add(password);
+		JTextField passwordField = new JTextField(20);
+		password.setLabelFor(passwordField);
+		frame.add(passwordField);
+
+		SpringUtilities.makeCompactGrid(frame,
+				labels.length, 2, //rows, cols
+				6, 6,        //initX, initY
+				6, 6); 
+	}
+}

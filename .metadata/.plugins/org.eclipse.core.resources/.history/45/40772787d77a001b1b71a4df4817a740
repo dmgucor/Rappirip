@@ -1,0 +1,10 @@
+package main;
+
+public class RappiripGUI {
+	
+	private LoginGUI loginScreen;
+	
+	public RappiripGUI() {
+		loginScreen = new LoginGUI();
+	}
+}

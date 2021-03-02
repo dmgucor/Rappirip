@@ -1,0 +1,45 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class Login {
+	private Conexion conexion;
+
+	public Login() {
+		conexion = new Conexion();
+	}
+	public void login(String username, String password) {
+		try {
+			conexion.get();
+			ResultSet resultado = conexion.consultar("SELECT password FROM usuario WHERE username = " + username + ";");
+			resultado.last();
+
+			if(resultado.getRow() > 0) {
+				resultado = conexion.consultar("SELECT nombre FROM usuario WHERE username = " + username + ";");
+				System.out.println("Bienvenido " + resultado.getString("nombre"));
+			}
+			else {
+				System.out.println("Usuario o clave incorrecto");
+			}
+		}
+		catch(SQLException e) {
+
+		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		Login login = new Login();
+
+		System.out.println("Ingrese su nombre de usuario");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		String username = reader.readLine();
+		System.out.println("ingrese su contraseña");
+		String password = reader.readLine();
+		reader.close();
+
+		login.login(username, password);
+
+	}
+}
