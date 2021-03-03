@@ -6,6 +6,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -13,21 +15,39 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
+import extras.Conexion;
 import extras.LimitDocumentFilter;
 import extras.SpringUtilities;
+import modulos.Login;
 
 public class LoginGUI {
+	static String ERROR_LOGIN = "Usuario o clave incorrecto";
+	
 	JFrame frame;
 	String[] labels = {"Usuario: ", "Contraseña: "};
-	GridBagConstraints constraints = new GridBagConstraints();
+	GridBagConstraints constraints;
+	JTextField usernameField;
+	JPasswordField passwordField;
+	JButton iniciarSesion;
+	Login loginLogica;
 
-	public LoginGUI() {
+	public LoginGUI(Conexion conexion) { 
+		//Inicializar atributos
+		constraints = new GridBagConstraints();
+		usernameField = new JTextField(20);
+		passwordField = new JPasswordField(20);	
+		iniciarSesion = new JButton("Iniciar sesión");
+		loginLogica = new Login(conexion);
+
 		//Configuración de la ventana
 		frame = new JFrame();
 		frame.setBounds(500, 200, 200, 500);
@@ -58,11 +78,23 @@ public class LoginGUI {
 
 	//Botón para iniciar sesión
 	private void setBotonIniciar(JFrame frame) {
-		JButton iniciarSesion = new JButton("Iniciar sesión");
 		constraints.gridx = 0;
 		constraints.gridy = 2;
 		constraints.insets = new Insets(20, 50, 50, 50);
+		iniciarSesion.setEnabled(false);
 
+		//Funcionalidad del botón
+		iniciarSesion.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Boolean logueado = loginLogica.login(usernameField.getText().trim(), passwordField.getPassword());
+				if(!logueado) {
+					JOptionPane.showMessageDialog(frame, ERROR_LOGIN, "Error",JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		
 		frame.add(iniciarSesion, constraints);
 	}
 
@@ -71,19 +103,22 @@ public class LoginGUI {
 		//Panel que contiene la forma
 		JPanel panel = new JPanel(new SpringLayout());
 
+		//Document listener para detectar cambios en los campos
+		DocumentListener myDocListener = new MyDocListener();
+
 		//Agregar labels y configurar textFields
 		JLabel username = new JLabel(labels[0], JLabel.TRAILING);
 		panel.add(username);
-		JTextField usernameField = new JTextField(20);
 		((AbstractDocument)usernameField.getDocument()).setDocumentFilter(new LimitDocumentFilter(25));
 		username.setLabelFor(usernameField);
+		usernameField.getDocument().addDocumentListener(myDocListener);
 		panel.add(usernameField);
 
 		JLabel password = new JLabel(labels[1], JLabel.TRAILING);
 		panel.add(password);
-		JPasswordField passwordField = new JPasswordField(20);
 		((AbstractDocument)passwordField.getDocument()).setDocumentFilter(new LimitDocumentFilter(20));
 		password.setLabelFor(passwordField);
+		passwordField.getDocument().addDocumentListener(myDocListener);
 		panel.add(passwordField);
 
 		SpringUtilities.makeCompactGrid(panel,
@@ -124,6 +159,33 @@ public class LoginGUI {
 		constraints.gridy = 3;
 		constraints.insets = new Insets(50, 50, 20, 50);
 		frame.add(registrarse, constraints);
+	}
+
+	public void verificarCamposLlenos() {
+		if(usernameField.getText().trim().isEmpty() || passwordField.getPassword().length == 0) {
+			iniciarSesion.setEnabled(false);
+		}
+		else iniciarSesion.setEnabled(true);
+	}
+
+	private class MyDocListener implements DocumentListener
+	{
+
+		public void changedUpdate(DocumentEvent e)
+		{
+			verificarCamposLlenos();
+		}
+
+		public void insertUpdate(DocumentEvent e)
+		{
+			verificarCamposLlenos();
+		}
+
+		public void removeUpdate(DocumentEvent e)
+		{
+			verificarCamposLlenos();
+		}
+
 	}
 
 }
