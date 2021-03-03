@@ -38,7 +38,8 @@ public class LoginGUI {
 	JTextField usernameField;
 	JPasswordField passwordField;
 	JButton iniciarSesion;
-	Login loginLogica;
+	Login loginLogica; 
+	Conexion conexion;
 
 	public LoginGUI(Conexion conexion) { 
 		//Inicializar atributos
@@ -47,6 +48,7 @@ public class LoginGUI {
 		passwordField = new JPasswordField(20);	
 		iniciarSesion = new JButton("Iniciar sesión");
 		loginLogica = new Login(conexion);
+		this.conexion = conexion;
 
 		//Configuración de la ventana
 		frame = new JFrame();
@@ -141,7 +143,7 @@ public class LoginGUI {
 		registrarse.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// the user clicks on the label
+				new RegistroGUI(frame, conexion);
 			}
 
 			@Override

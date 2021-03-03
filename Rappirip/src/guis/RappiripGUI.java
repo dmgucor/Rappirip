@@ -13,6 +13,6 @@ public class RappiripGUI {
 	}
 	
 	public static void main(String[] args) {
-		RappiripGUI rgui = new RappiripGUI();
+		new RappiripGUI();
 	}
 }
