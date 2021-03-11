@@ -17,6 +17,7 @@ public class Registro {
 	public String registrarUsuario(String username, char[] password, String nombre, int avatar_id) {
 		String message = "";
 		try {
+			conexion.get();
 			ResultSet consultaUsername = conexion.consultar("SELECT username FROM log_in WHERE username = '" + username + "';" );
 			//Ya existe el nombre de usuario
 			if(consultaUsername.next())
@@ -24,8 +25,8 @@ public class Registro {
 
 			else {
 				//Registrar usuario
-				conexion.consultar("INSERT INTO log_in VALUES ('" + username + "', '" + new String(password) + "');");
-				conexion.consultar("INSERT INTO usuario VALUES ('" + username + "', '" + nombre + "', " + avatar_id + ", '" + USUARIO_CLIENTE + "');");
+				conexion.actualizar("INSERT INTO log_in VALUES ('" + username + "', '" + new String(password) + "');");
+				conexion.actualizar("INSERT INTO usuario VALUES ('" + username + "', '" + nombre + "', " + avatar_id + ", '" + USUARIO_CLIENTE + "');");
 
 				message = "Se ha registrado a " + username + " exitosamente!";
 			}

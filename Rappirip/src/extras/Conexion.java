@@ -48,5 +48,15 @@ public class Conexion {
 			return null;
 		}        return resultado;
 	}
+	
+	public void actualizar(String sql) {
+		try {
+			Statement sentencia = getConexion().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE);
+			sentencia.executeUpdate(sql);
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
 
 }

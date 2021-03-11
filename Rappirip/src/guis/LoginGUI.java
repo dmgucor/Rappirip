@@ -15,7 +15,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -46,6 +45,7 @@ public class LoginGUI {
 	JLabel password;
 	JPanel panelFormaInicio;
 	SteelCheckBox switchButton;
+	JLabel errorLabel;
 
 	boolean darkModeActive = false;
 
@@ -67,9 +67,10 @@ public class LoginGUI {
 		loginLogica = new Login(conexion);
 		modoIcon = new JLabel();
 		this.conexion = conexion;
+		errorLabel = new JLabel();
 
 		//Configuración de la ventana
-		frame = new JFrame();
+		frame = new JFrame("Iniciar sesión");
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridBagLayout());
@@ -101,7 +102,7 @@ public class LoginGUI {
 	//Botón para iniciar sesión
 	private void setBotonIniciar(JFrame frame) {
 		constraints.gridx = 0;
-		constraints.gridy = 2;
+		constraints.gridy = 3;
 		constraints.insets = new Insets(20, 50, 50, 50);
 		iniciarSesion.setEnabled(false);
 
@@ -112,7 +113,7 @@ public class LoginGUI {
 			public void actionPerformed(ActionEvent arg0) {
 				Boolean logueado = loginLogica.login(usernameField.getText().trim(), passwordField.getPassword());
 				if(!logueado) {
-					JOptionPane.showMessageDialog(frame, ERROR_LOGIN, "Error",JOptionPane.ERROR_MESSAGE);
+					errorLabel.setText(ERROR_LOGIN);
 				}
 			}
 		});
@@ -150,9 +151,16 @@ public class LoginGUI {
 
 		//Constraints para el panel con la forma
 		constraints.gridy = 1;
-		constraints.insets = new Insets(50, 10, 10, 10);
+		constraints.insets = new Insets(50, 20, 10, 20);
 
 		frame.add(panelFormaInicio, constraints);
+		
+		//Configuración del label con errores
+		errorLabel.setText(" ");
+		errorLabel.setForeground(Color.RED);
+		constraints.gridy = 2;
+		constraints.insets = new Insets(0, 0, 0, 0);
+		frame.add(errorLabel, constraints);
 	}
 
 	private void setRegistrar(JFrame frame) {
@@ -181,7 +189,7 @@ public class LoginGUI {
 		});
 
 		constraints.gridx = 0;
-		constraints.gridy = 3;
+		constraints.gridy = 4;
 		constraints.insets = new Insets(50, 50, 20, 50);
 		frame.add(registrarse, constraints);
 	}
@@ -189,7 +197,7 @@ public class LoginGUI {
 	private void setDarkModeToggle() {
 		modoIcon.setIcon(new ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/sun.png")).getImage()));
 		constraints.gridx = 0;
-		constraints.gridy = 4;
+		constraints.gridy = 5;
 		constraints.gridwidth = 1;
 		constraints.insets = new Insets(0, 10, 10, 10);
 		frame.add(modoIcon, constraints);
@@ -213,7 +221,7 @@ public class LoginGUI {
 
 		constraints = new GridBagConstraints();
 		constraints.gridx = 1;
-		constraints.gridy = 4;
+		constraints.gridy = 5;
 		constraints.insets = new Insets(0, 0, 0, 0);
 		frame.add(switchButton, constraints);
 
@@ -232,6 +240,7 @@ public class LoginGUI {
 	private void verificarCamposLlenos() {
 		if(usernameField.getText().trim().isEmpty() || passwordField.getPassword().length == 0) {
 			iniciarSesion.setEnabled(false);
+			errorLabel.setText(" ");
 		}
 		else iniciarSesion.setEnabled(true);
 	}

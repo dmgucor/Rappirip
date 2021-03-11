@@ -44,21 +44,4 @@ public class Login {
 
 		return logueado;
 	}
-
-	/*
-	 * public static void main(String[] args) throws IOException { Login login = new
-	 * Login(con); BufferedReader reader = new BufferedReader(new
-	 * InputStreamReader(System.in));
-	 * 
-	 * boolean logged = false; while (!logged) {
-	 * System.out.println("Ingrese su nombre de usuario");
-	 * 
-	 * String username = reader.readLine();
-	 * System.out.println("ingrese su contraseña"); String password =
-	 * reader.readLine();
-	 * 
-	 * logged = login.login(username, password); } reader.close();
-	 * 
-	 * }
-	 */
 }

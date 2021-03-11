@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -15,11 +18,13 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,11 +32,13 @@ import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
 import extras.Conexion;
+import extras.LetterDocumentFilter;
 import extras.LimitDocumentFilter;
 import extras.SpringUtilities;
 import modulos.Registro;
@@ -42,11 +49,15 @@ public class RegistroGUI {
 	GridBagConstraints constraints;
 	JTextField usernameField;
 	JPasswordField passwordField;
-	JTextField confirmarPassField;
+	JPasswordField confirmarPassField;
 	JTextField nombreField;
 	Registro registroLogica;
 	ArrayList<AvatarLabel> listaAvatares;
 	boolean darkModeActive;
+	JLabel errorPassword;
+	JLabel errorMatchingPass;
+	JButton registrar;
+	JFrame loginFrame;
 
 	static String DM_FONDO_COLOR = "#000000";
 	static String DM_LABEL_COLOR_ = "#FFFFFF";
@@ -57,18 +68,19 @@ public class RegistroGUI {
 
 	public RegistroGUI(JFrame loginFrame, Conexion conexion, boolean darkModeActive) {
 		loginFrame.setVisible(false);
+		this.loginFrame = loginFrame;
 
 		//Inicializar atributos
 		constraints = new GridBagConstraints();
 		usernameField = new JTextField(20);
 		passwordField = new JPasswordField(20);
-		confirmarPassField = new JTextField(20);
+		confirmarPassField = new JPasswordField(20);
 		nombreField = new JTextField(20);
 		registroLogica = new Registro(conexion);
 		this.darkModeActive = darkModeActive;
 
 		//Configuración de la ventana
-		frame = new JFrame();
+		frame = new JFrame("Registrar usuario");
 		frame.setResizable(false);
 		frame.setLayout(new GridBagLayout());
 		if (darkModeActive)
@@ -107,6 +119,8 @@ public class RegistroGUI {
 
 		//Document listener para detectar cambios en los campos
 		DocumentListener myDocListener = new MyDocListener();
+		DocumentListener passListener = new PasswordListener();
+		DocumentListener matchingPassListener = new MatchPasswordListener();
 
 		//Agregar labels y configurar textFields
 		JLabel username = new JLabel(labels[0], JLabel.TRAILING);
@@ -126,17 +140,19 @@ public class RegistroGUI {
 		panelIzquierda.add(password);
 		((AbstractDocument)passwordField.getDocument()).setDocumentFilter(new LimitDocumentFilter(20));
 		password.setLabelFor(passwordField);
+		passwordField.getDocument().addDocumentListener(passListener);
 		passwordField.getDocument().addDocumentListener(myDocListener);
 		panelIzquierda.add(passwordField);
 
 		SpringUtilities.makeCompactGrid(panelIzquierda,
 				2, 2, //rows, cols
 				6, 6,        //initX, initY
-				6, 15); 		//xPad, yPad
+				6, 10); 		//xPad, yPad
+
 
 		constraints.gridx = 0;
 		constraints.gridy = 0;
-		constraints.insets = new Insets(20, 20, 10, 10);
+		constraints.insets = new Insets(20, 20, 0, 10);
 
 		frame.add(panelIzquierda, constraints);
 
@@ -155,6 +171,7 @@ public class RegistroGUI {
 
 		panelDerecha.add(nombre);
 		((AbstractDocument)nombreField.getDocument()).setDocumentFilter(new LimitDocumentFilter(35));
+		((AbstractDocument)nombreField.getDocument()).setDocumentFilter(new LetterDocumentFilter());
 		nombre.setLabelFor(nombreField);
 		nombreField.getDocument().addDocumentListener(myDocListener);
 		panelDerecha.add(nombreField);
@@ -167,23 +184,41 @@ public class RegistroGUI {
 		panelDerecha.add(confirmarPass);
 		((AbstractDocument)confirmarPassField.getDocument()).setDocumentFilter(new LimitDocumentFilter(20));
 		confirmarPass.setLabelFor(confirmarPassField);
+		confirmarPassField.getDocument().addDocumentListener(matchingPassListener);
 		confirmarPassField.getDocument().addDocumentListener(myDocListener);
+		confirmarPassField.setEnabled(false);
 		panelDerecha.add(confirmarPassField);
 
 		SpringUtilities.makeCompactGrid(panelDerecha,
 				2, 2, //rows, cols
 				6, 6,        //initX, initY
-				6, 15); 		//xPad, yPad
+				6, 10); 		//xPad, yPad
 
 		constraints.gridx = 1;
 		constraints.gridy = 0;
-		constraints.insets = new Insets(20, 10, 10, 20);
+		constraints.insets = new Insets(20, 10, 0, 20);
 
 		frame.add(panelDerecha, constraints);
 
-		constraints.insets = new Insets(0, 0, 0, 0);
+		//Labels para advertencias
+		errorPassword = new JLabel(" ");
+		errorPassword.setForeground(Color.RED);
 		constraints.gridx = 0;
 		constraints.gridy = 1;
+		constraints.insets = new Insets(0, 195, 20, 0);
+		frame.add(errorPassword, constraints);
+
+		errorMatchingPass = new JLabel(" ");
+		errorMatchingPass.setForeground(Color.RED);
+		constraints.gridx = 1;
+		constraints.gridy = 1;
+		constraints.insets = new Insets(0, 170, 20, 0);
+		frame.add(errorMatchingPass, constraints);
+
+		//Separador
+		constraints.insets = new Insets(0, 0, 0, 0);
+		constraints.gridx = 0;
+		constraints.gridy = 2;
 		constraints.gridwidth = 2;
 
 		JSeparator separator = new JSeparator(JSeparator.HORIZONTAL);
@@ -269,7 +304,7 @@ public class RegistroGUI {
 		}
 
 		constraints.gridx = 0;
-		constraints.gridy = 2;
+		constraints.gridy = 3;
 		constraints.gridwidth = 2;
 		frame.add(avatarPanel, constraints);
 
@@ -293,29 +328,36 @@ public class RegistroGUI {
 			botonesPanel.setBackground(Color.decode(DM_FONDO_COLOR));
 		else
 			botonesPanel.setBackground(Color.decode(LM_FONDO_COLOR));
-		JButton aceptar = new JButton("Cancelar");
-		JButton cancelar = new JButton("Registrarse");
 
-		/*
-		 * constraints = new GridBagConstraints(); constraints.gridx = 0;
-		 * constraints.gridy = 0; constraints.insets = new Insets(0, 100, 40, 50);
-		 * botonesPanel.add(aceptar, constraints); constraints.gridx = 1;
-		 * constraints.insets = new Insets(0, 50, 40, 100); botonesPanel.add(cancelar,
-		 * constraints);
-		 * 
-		 * constraints.gridx = 0; constraints.gridy = 3; constraints.gridwidth = 2;
-		 * constraints.insets = new Insets(0, 0, 0, 0);
-		 */
+		JButton cancelar = new JButton("Cancelar");
+		cancelar.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose(); 
+				loginFrame.setVisible(true);
+			}
+		});
+
+		registrar = new JButton("Registrarse");
+		registrar.setEnabled(false);
+		registrar.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				registrarUsuario();
+			}
+		});
 
 		constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 		constraints.insets = new Insets(0, 50, 0, 0);
-		botonesPanel.add(aceptar, constraints);
+		botonesPanel.add(cancelar, constraints);
 
 		JSeparator separator = new JSeparator(JSeparator.VERTICAL);
 		Dimension d = separator.getPreferredSize();
-		d.height = aceptar.getPreferredSize().height;
+		d.height = cancelar.getPreferredSize().height;
 		separator.setPreferredSize(d);
 		constraints.gridx = 1;
 		constraints.gridy = 0;
@@ -324,55 +366,230 @@ public class RegistroGUI {
 
 		constraints.gridx = 2;
 		constraints.insets = new Insets(0, 0, 0, 0);
-		botonesPanel.add(cancelar, constraints);
+		botonesPanel.add(registrar, constraints);
 
 		constraints.gridx = 1;
-		constraints.gridy = 3;
+		constraints.gridy = 4;
 		constraints.insets = new Insets(0, 0, 20, 0);
 
 		frame.add(botonesPanel, constraints);
 	}
 
-	public class MyDocListener implements DocumentListener
-	{
+	private void registrarUsuario() {
+		String res = registroLogica.registrarUsuario(usernameField.getText().trim(), passwordField.getPassword(), nombreField.getText(), avatarActivo);
+		if(res.equals("Oops! Este nombre de usuario ya existe"))
+			new ErrorDialog(res, frame, darkModeActive);
+		else {
+			new RegisterDialog(res, frame, darkModeActive);
+			loginFrame.setVisible(true);
+		}
+	}
 
-		public void changedUpdate(DocumentEvent e)
-		{
+	public class PasswordListener implements DocumentListener{
+
+		public void checkPassword() {
+			if(passwordField.getPassword().length < 6) {
+				errorPassword.setText("Mínimo 6 caracteres");
+				confirmarPassField.setEnabled(false);
+			}
+			else {
+				errorPassword.setText(" ");
+				confirmarPassField.setEnabled(true);
+			}
 
 		}
-
-		public void insertUpdate(DocumentEvent e)
-		{
-
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			checkPassword();
 		}
 
-		public void removeUpdate(DocumentEvent e)
-		{
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			checkPassword();
+		}
 
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			checkPassword();
 		}
 
 	}
 
+	public class MatchPasswordListener implements DocumentListener{
 
+		public void checkPasswords() {
+			if(!Arrays.equals(passwordField.getPassword(), confirmarPassField.getPassword())) {
+				errorMatchingPass.setText("Las contraseñas no coinciden");
+			}
+			else errorMatchingPass.setText(" ");
+		}
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			checkPasswords();
+		}
 
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			checkPasswords();
+		}
 
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			checkPasswords();
+		}
 
+	}
 
+	public class MyDocListener implements DocumentListener
+	{
+		public void verificarCamposLlenos() {
+			if(nombreField.getText().length() > 0 && usernameField.getText().length() > 0 && 
+					passwordField.getPassword().length >= 6 && Arrays.equals(passwordField.getPassword(), confirmarPassField.getPassword())) {
+				registrar.setEnabled(true);				
+			}
+			else
+				registrar.setEnabled(false);
+		}
 
+		public void changedUpdate(DocumentEvent e)
+		{
+			verificarCamposLlenos();
+		}
 
+		public void insertUpdate(DocumentEvent e)
+		{
+			verificarCamposLlenos();
+		}
 
+		public void removeUpdate(DocumentEvent e)
+		{
+			verificarCamposLlenos();
+		}
 
+	}
 
+	@SuppressWarnings("serial")
+	public class RegisterDialog extends JDialog implements ActionListener{
+		JButton boton;
+		String inputMessage;
+		JFrame registrarFrame;
 
+		public RegisterDialog(String inputMessage, JFrame registrarFrame, boolean darkMode) {
+			//Configuración del diálogo
+			super(registrarFrame, "Registro exitoso", true);
+			Point ubicacion = registrarFrame.getLocation();
+			setLocation(ubicacion.x + 240, ubicacion.y + 100);
+			this.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosed(WindowEvent e) {
+					dispose();
+					registrarFrame.dispose();
+				}
+			});
 
+			//DarkMode
+			String fondoColor = "";
+			String labelColor = "";
+			if(darkMode) {
+				fondoColor = DM_FONDO_COLOR;
+				labelColor = DM_LABEL_COLOR_;
+			}
+			else {
+				fondoColor = LM_FONDO_COLOR;
+				labelColor = LM_LABEL_COLOR;
+			}
 
+			//Info del diálogo
+			this.inputMessage = inputMessage;
+			this.registrarFrame = registrarFrame;
 
+			//Panel
+			JPanel panel = new JPanel(new GridBagLayout());
+			panel.setBackground(Color.decode(fondoColor));
+			GridBagConstraints constraints = new GridBagConstraints();
+			boton = new JButton("Aceptar");
+			boton.addActionListener(this);
+			JLabel mensaje = new JLabel(inputMessage);
+			mensaje.setForeground(Color.decode(labelColor));
 
+			constraints.gridx = 0;
+			constraints.gridy = 0;
+			constraints.insets = new Insets(15, 10, 15, 10);
+			panel.add(mensaje, constraints);
+			constraints.gridy = 1;
+			constraints.insets = new Insets(0, 0, 10, 0);
+			panel.add(boton, constraints);
 
+			this.setBackground(Color.decode(fondoColor));
+			getContentPane().add(panel);
+			pack();
+			this.setVisible(true);
 
+		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			dispose();
+			registrarFrame.dispose();
+		}
+	}
 
+	@SuppressWarnings("serial")
+	public class ErrorDialog extends JDialog implements ActionListener{
+		JButton boton;
+		String inputMessage;
+		JFrame registrarFrame;
 
+		public ErrorDialog(String inputMessage, JFrame registrarFrame, boolean darkMode) {
+			//Configuración del diálogo
+			super(registrarFrame, "Error", true);
+			Point ubicacion = registrarFrame.getLocation();
+			setLocation(ubicacion.x + 240, ubicacion.y + 100);
+			this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
+			//DarkMode
+			String fondoColor = "";
+			String labelColor = "";
+			if(darkMode) {
+				fondoColor = DM_FONDO_COLOR;
+				labelColor = DM_LABEL_COLOR_;
+			}
+			else {
+				fondoColor = LM_FONDO_COLOR;
+				labelColor = LM_LABEL_COLOR;
+			}
+
+			//Info del diálogo
+			this.inputMessage = inputMessage;
+			this.registrarFrame = registrarFrame;
+
+			//Panel
+			JPanel panel = new JPanel(new GridBagLayout());
+			panel.setBackground(Color.decode(fondoColor));
+			GridBagConstraints constraints = new GridBagConstraints();
+			boton = new JButton("Aceptar");
+			boton.addActionListener(this);
+			JLabel mensaje = new JLabel(inputMessage);
+			mensaje.setForeground(Color.decode(labelColor));
+
+			constraints.gridx = 0;
+			constraints.gridy = 0;
+			constraints.insets = new Insets(15, 10, 15, 10);
+			panel.add(mensaje, constraints);
+			constraints.gridy = 1;
+			constraints.insets = new Insets(0, 0, 10, 0);
+			panel.add(boton, constraints);
+
+			this.setBackground(Color.decode(fondoColor));
+			getContentPane().add(panel);
+			pack();
+			this.setVisible(true);
+
+		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			dispose();
+		}
+	}
 
 
 }

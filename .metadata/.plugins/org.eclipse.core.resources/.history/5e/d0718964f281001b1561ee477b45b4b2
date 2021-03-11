@@ -1,0 +1,35 @@
+package extras;
+
+import java.awt.Toolkit;
+
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+
+
+public class LetterDocumentFilter extends DocumentFilter {
+	@Override
+	public void insertString(DocumentFilter.FilterBypass fp, int offset,
+			String stringToFilter, AttributeSet aset)
+					throws BadLocationException {
+		int len = stringToFilter.length();
+		int r = Character.compare(stringToFilter.charAt(len-1), ' ');
+		System.out.println(r);
+		System.out.println("llgea");
+		if (Character.isLetter(stringToFilter.charAt(len - 1)) || Character.compare(stringToFilter.charAt(len-1), ' ') == 0)
+			super.insertString(fp, offset, stringToFilter, aset);
+		else
+			Toolkit.getDefaultToolkit().beep();
+	}
+	
+	 @Override
+	    public void replace(DocumentFilter.FilterBypass fp, int offset, int length,
+	                                        String stringToFilter, AttributeSet aset)
+	                                                    throws BadLocationException {
+	        int len = stringToFilter.length();
+	        if (Character.isLetter(stringToFilter.charAt(len - 1)))
+	            super.replace(fp, offset, length, stringToFilter, aset);
+	        else
+	            Toolkit.getDefaultToolkit().beep();
+	    }
+}
