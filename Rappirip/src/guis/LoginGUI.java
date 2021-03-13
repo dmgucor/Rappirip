@@ -2,6 +2,7 @@ package guis;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -24,6 +25,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
 import eu.hansolo.custom.SteelCheckBox;
+import extras.Colores;
 import extras.Conexion;
 import extras.LimitDocumentFilter;
 import extras.SpringUtilities;
@@ -46,16 +48,21 @@ public class LoginGUI {
 	JPanel panelFormaInicio;
 	SteelCheckBox switchButton;
 	JLabel errorLabel;
+	JLabel registrarse;
+
+	Color colorFondo;
+	Color colorLabel;
+	Color colorTextFields;
+	Color colorBordeTextfield;
+	Color colorSombraTextfield;
+	Color colorHiperlink;
+	Color colorHiperlinkActivo;
+	Color colorTextFieldContenido;
 
 	boolean darkModeActive = false;
 
-	static String DM_FONDO_COLOR = "#000000";
-	static String DM_LABEL_COLOR_ = "#FFFFFF";
-	static String LM_FONDO_COLOR = "#EEEEEE";
-	static String LM_LABEL_COLOR = "#000000";
-	static String MOON_ROUTE = "/moon.png";
-	static String SUN_ROUTE = "/sun.png";
-
+	static String LIGHT_ROUTE = "/rojo.png";
+	static String DARK_ROUTE = "/negro.png";
 
 
 	public LoginGUI(Conexion conexion) { 
@@ -69,11 +76,22 @@ public class LoginGUI {
 		this.conexion = conexion;
 		errorLabel = new JLabel();
 
+		//colores del tema
+		colorLabel = Colores.LM_LABEL.getColor();
+		colorFondo = Colores.LM_MAIN.getColor();
+		colorTextFields = Colores.LM_TEXTFIELD.getColor();
+		colorBordeTextfield = Colores.LM_TEXTFIELD_BORDER.getColor();
+		colorSombraTextfield = Colores.LM_TEXTFIELD_SHADE.getColor();
+		colorHiperlink = Colores.LM_HYPERLINK.getColor();
+		colorHiperlinkActivo = Colores.LM_HYPERLINK_ENTERED.getColor();
+		colorTextFieldContenido = Colores.LM_TEXTFIELD_CONTENT.getColor();
+
 		//Configuración de la ventana
 		frame = new JFrame("Iniciar sesión");
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridBagLayout());
+		frame.getContentPane().setBackground(colorFondo);
 
 		setLogo(frame);
 		setFormaInicio(frame);
@@ -89,7 +107,7 @@ public class LoginGUI {
 	//Imagen con el logo
 	private void setLogo(JFrame frame) {
 		JLabel picLogo = new JLabel();
-		picLogo.setIcon(new ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/logo.png")).getImage().getScaledInstance(357-150, 234-100, Image.SCALE_SMOOTH)));
+		picLogo.setIcon(new ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/logo.png")).getImage().getScaledInstance(456-120, 293-90, Image.SCALE_SMOOTH)));
 
 		constraints.gridx = 0;
 		constraints.gridy = 0;
@@ -125,22 +143,35 @@ public class LoginGUI {
 	private void setFormaInicio(JFrame frame) {
 		//Panel que contiene la forma
 		panelFormaInicio = new JPanel(new SpringLayout());
+		panelFormaInicio.setBackground(colorFondo);
 
 		//Document listener para detectar cambios en los campos
 		DocumentListener myDocListener = new MyDocListener();
 
 		//Agregar labels y configurar textFields
 		username = new JLabel(labels[0], JLabel.TRAILING);
+		username.setForeground(colorLabel);
 		panelFormaInicio.add(username);
 		((AbstractDocument)usernameField.getDocument()).setDocumentFilter(new LimitDocumentFilter(25));
 		username.setLabelFor(usernameField);
+		usernameField.setSelectionColor(colorTextFields);
+		usernameField.setBorder(javax.swing.BorderFactory.createBevelBorder(1, colorBordeTextfield, colorSombraTextfield));
+		usernameField.setPreferredSize(new Dimension(usernameField.getWidth(), 25));
+		usernameField.setForeground(colorTextFieldContenido);
 		usernameField.getDocument().addDocumentListener(myDocListener);
 		panelFormaInicio.add(usernameField);
 
 		password = new JLabel(labels[1], JLabel.TRAILING);
+		password.setForeground(colorLabel);
 		panelFormaInicio.add(password);
 		((AbstractDocument)passwordField.getDocument()).setDocumentFilter(new LimitDocumentFilter(20));
+		passwordField.setPreferredSize(new Dimension(usernameField.getWidth(), 25));
+		passwordField.setBorder(javax.swing.BorderFactory.createBevelBorder(1, colorBordeTextfield, colorSombraTextfield));
+		passwordField.setForeground(colorTextFieldContenido);
 		password.setLabelFor(passwordField);
+
+		passwordField.setSelectionColor(colorTextFields);
+
 		passwordField.getDocument().addDocumentListener(myDocListener);
 		panelFormaInicio.add(passwordField);
 
@@ -154,18 +185,18 @@ public class LoginGUI {
 		constraints.insets = new Insets(50, 20, 10, 20);
 
 		frame.add(panelFormaInicio, constraints);
-		
+
 		//Configuración del label con errores
 		errorLabel.setText(" ");
-		errorLabel.setForeground(Color.RED);
+		errorLabel.setForeground(Color.decode("#e5707e"));
 		constraints.gridy = 2;
 		constraints.insets = new Insets(0, 0, 0, 0);
 		frame.add(errorLabel, constraints);
 	}
 
 	private void setRegistrar(JFrame frame) {
-		JLabel registrarse = new JLabel("Crea tu cuenta");
-		registrarse.setForeground(Color.decode("#5c704e"));
+		registrarse = new JLabel("Crea tu cuenta");
+		registrarse.setForeground(colorHiperlink);
 		registrarse.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
 		registrarse.addMouseListener(new MouseAdapter() {
@@ -176,15 +207,12 @@ public class LoginGUI {
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				if(!darkModeActive)
-					registrarse.setForeground(Color.decode("#1e251a"));
-				else 
-					registrarse.setForeground(Color.decode("#adb7a6"));
+				registrarse.setForeground(colorHiperlinkActivo);
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				registrarse.setForeground(Color.decode("#5c704e"));
+				registrarse.setForeground(colorHiperlink);
 			}
 		});
 
@@ -195,7 +223,7 @@ public class LoginGUI {
 	}
 
 	private void setDarkModeToggle() {
-		modoIcon.setIcon(new ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/sun.png")).getImage()));
+		modoIcon.setIcon(new ImageIcon(new javax.swing.ImageIcon(getClass().getResource(DARK_ROUTE)).getImage()));
 		constraints.gridx = 0;
 		constraints.gridy = 5;
 		constraints.gridwidth = 1;
@@ -203,19 +231,41 @@ public class LoginGUI {
 		frame.add(modoIcon, constraints);
 
 		switchButton = new SteelCheckBox();
-		switchButton.setText(".");
-		switchButton.setForeground(Color.decode(LM_FONDO_COLOR));
+		switchButton.setText(" ");
 		switchButton.setRised(false);
 		switchButton.setColored(true);
+		switchButton.setBackground(colorFondo);
 
 		switchButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				darkModeActive = !darkModeActive;
-				if(darkModeActive)
-					toggleMode(DM_FONDO_COLOR, DM_LABEL_COLOR_, MOON_ROUTE);
-				else toggleMode(LM_FONDO_COLOR, LM_LABEL_COLOR, SUN_ROUTE);
+				String iconRoute = "";
+				if(darkModeActive) {
+					colorFondo = Colores.DM_MAIN.getColor();
+					colorLabel = Colores.DM_LABEL.getColor();
+					colorTextFields = Colores.DM_TEXTFIELD.getColor();
+					colorBordeTextfield = Colores.DM_TEXTFIELD_BORDER.getColor();
+					colorSombraTextfield = Colores.DM_TEXTFIELD_SHADE.getColor();
+					colorHiperlink = Colores.DM_HYPERLINK.getColor();
+					colorHiperlinkActivo = Colores.DM_HYPERLINK_ENTERED.getColor();
+					colorTextFieldContenido = Colores.DM_TEXTFIELD_CONTENT.getColor();
+					iconRoute = LIGHT_ROUTE;
+				}
+				else {
+					colorFondo = Colores.LM_MAIN.getColor();
+					colorLabel = Colores.LM_LABEL.getColor();
+					colorTextFields = Colores.LM_TEXTFIELD.getColor();
+					colorTextFields = Colores.LM_TEXTFIELD.getColor();
+					colorBordeTextfield = Colores.LM_TEXTFIELD_BORDER.getColor();
+					colorSombraTextfield = Colores.LM_TEXTFIELD_SHADE.getColor();
+					colorHiperlink = Colores.LM_HYPERLINK.getColor();
+					colorHiperlinkActivo = Colores.LM_HYPERLINK_ENTERED.getColor();
+					colorTextFieldContenido = Colores.LM_TEXTFIELD_CONTENT.getColor();
+					iconRoute = DARK_ROUTE;
+				}
 
+				toggleMode(iconRoute);
 			}
 		});
 
@@ -227,14 +277,20 @@ public class LoginGUI {
 
 	}
 
-	private void toggleMode(String fondoColor, String labelColor, String iconRoute) {
-		frame.getContentPane().setBackground(Color.decode(fondoColor));
-		username.setForeground(Color.decode(labelColor));
-		password.setForeground(Color.decode(labelColor));
-		panelFormaInicio.setBackground(Color.decode(fondoColor));
-		switchButton.setBackground(Color.decode(fondoColor));
+	private void toggleMode(String iconRoute) {
+		frame.getContentPane().setBackground(colorFondo);
+		username.setForeground(colorLabel);
+		password.setForeground(colorLabel);
+		panelFormaInicio.setBackground(colorFondo);
+		switchButton.setBackground(colorFondo);
+		passwordField.setBackground(colorTextFields);
+		passwordField.setBorder(javax.swing.BorderFactory.createBevelBorder(1, colorBordeTextfield, colorSombraTextfield));
+		usernameField.setBorder(javax.swing.BorderFactory.createBevelBorder(1, colorBordeTextfield, colorSombraTextfield));
+		usernameField.setBackground(colorTextFields);
+		registrarse.setForeground(colorHiperlink);
+		passwordField.setForeground(colorTextFieldContenido);
+		usernameField.setForeground(colorTextFieldContenido);
 		modoIcon.setIcon(new ImageIcon(new javax.swing.ImageIcon(getClass().getResource(iconRoute)).getImage()));
-		switchButton.setForeground(Color.decode(fondoColor));
 	}
 
 	private void verificarCamposLlenos() {
