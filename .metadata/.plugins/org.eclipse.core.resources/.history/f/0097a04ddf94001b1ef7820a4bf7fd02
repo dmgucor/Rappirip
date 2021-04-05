@@ -1,0 +1,16 @@
+package controladores;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class ControladorContenido implements ActionListener {
+
+	private MainGUI vista;
+	private 
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}

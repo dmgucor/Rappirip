@@ -1,0 +1,60 @@
+package guis;
+
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+
+import extras.ColoresGeneral;
+import modelos.UsuarioModelo;
+
+public class EditarPerfilGUI extends JPanel {
+
+	private static final long serialVersionUID = 1L;
+	UsuarioModelo usuario;
+	
+	JPanel perfilPanel;
+	JPanel panelForma;
+	
+	Color fondoColor;
+	Color labelColor;
+	Color textfieldColor;
+	Color textfieldBorderColor;
+	Color textfieldShadowColor;
+	Color textfieldContentColor;
+
+	public EditarPerfilGUI(boolean darkMode, UsuarioModelo usuario) {
+		if(darkMode) {
+			fondoColor = ColoresGeneral.DM_FONDO.getColor();
+			labelColor = ColoresGeneral.DM_LABEL.getColor();
+			textfieldColor = ColoresGeneral.DM_TEXTFIELD.getColor();
+			textfieldBorderColor = ColoresGeneral.DM_TEXTFIELD_BORDER.getColor();
+			textfieldShadowColor = ColoresGeneral.DM_TEXTFIELD_SHADE.getColor();
+			textfieldContentColor = ColoresGeneral.DM_TEXTFIELD_CONTENT.getColor();
+		}
+
+	}
+
+	public void setFormaCLiente() {
+		String[] labels = {"Nombre: ", "Dirección: ", "Teléfono: ", "Icono" , "Mis tarjetas" };
+		
+		//Datos personales
+		JLabel perfil = new JLabel("Mi perfil");
+		perfilPanel = new JPanel();
+		perfilPanel.setLayout(new GridBagLayout());
+		GridBagConstraints cons = new GridBagConstraints();
+		
+		JLabel icono = new JLabel();
+		icono.setIcon(new ImageIcon(new javax.swing.ImageIcon(usuario.getAvatar()).getImage()));
+		perfilPanel.add(icono, cons);
+		
+		JPanel panelForma = new JPanel(new SpringLayout());
+		
+		
+		
+	}
+}

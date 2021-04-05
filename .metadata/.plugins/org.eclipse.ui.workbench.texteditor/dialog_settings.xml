@@ -2,16 +2,37 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="" key="selection"/>
+		<item value="Sys" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
+			<item value="sys"/>
+			<item value="Active"/>
+			<item value="LM"/>
+			<item value="direccion"/>
+			<item value="nombre"/>
+			<item value="username"/>
+			<item value="panelCliente"/>
+			<item value="darkModeActive"/>
+			<item value="border"/>
+			<item value="error"/>
+			<item value="errorl"/>
+			<item value="setsele"/>
+			<item value="Colores"/>
 			<item value="match"/>
 			<item value="system"/>
 		</list>
 		<list key="replacehistory">
+			<item value=""/>
+			<item value="DM"/>
+			<item value="celular"/>
+			<item value="direccion"/>
+			<item value="nombre"/>
+			<item value="mainPanel"/>
+			<item value="darkMode"/>
+			<item value="ColoresMain"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">

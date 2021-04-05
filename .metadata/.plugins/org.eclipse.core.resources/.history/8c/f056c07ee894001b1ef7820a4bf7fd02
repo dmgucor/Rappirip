@@ -1,0 +1,15 @@
+package modelos;
+
+import javax.swing.JPanel;
+
+import guis.EditarPerfilGUI;
+
+public class ModeloContenido {
+	public ModeloContenido() {
+		
+	}
+	
+	public JPanel getEditarPerfilPanel(boolean darkMode, UsuarioModelo usuario) {
+		return new EditarPerfilGUI(darkMode, usuario);
+	}
+}

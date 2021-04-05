@@ -1,0 +1,27 @@
+package controladores;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import guis.EditarPerfilGUI;
+import guis.MainGUI;
+import guis.PanelLateralGUI;
+import modelos.ModeloContenido;
+
+public class ControladorContenido implements ActionListener {
+
+	private MainGUI vista;
+	private ModeloContenido modelo;
+	
+	public ControladorContenido(MainGUI vista, ModeloContenido modelo) {
+		this.vista = vista;
+		 this.modelo = modelo;
+	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getActionCommand().equals(PanelLateralGUI.EDITAR_PERFIL)) {
+			vista.setContenido(modelo.getEditarPerfilPanel(vista.getDarkMode(), vista.getUsuario()));
+		}
+	}
+	
+}
